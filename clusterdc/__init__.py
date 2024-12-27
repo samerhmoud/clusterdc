@@ -5,5 +5,4 @@ from .main import *
 from .utils import *
 from .plotting import *
 from .data import *
-from .examples import *
 
