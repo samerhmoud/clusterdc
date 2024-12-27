@@ -45,10 +45,10 @@ if __name__ == "__main__":
 
 def load_training_data():
     """
-    Load training data from the package's data directory.
+    Load training data from a GitHub URL.
 
     Returns:
         DataFrame: The training data as a pandas DataFrame.
     """
-    with pkg_resources.open_text("clusterdc.data", "training_data.csv") as f:
-        return pd.read_csv(f)
+    url = "https://raw.githubusercontent.com/samerhmoud/clusterdc/main/clusterdc/data/training_data.csv"
+    return pd.read_csv(url)

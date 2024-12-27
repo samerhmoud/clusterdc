@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="clusterdc",  # Unique name for your package
-    version="0.2.0",  # Version of your package
+    version="0.0.0.1",  # Version of your package
     author="Samer Hmoud & Maximilien Meyrieux",
     author_email="geo.samer.hmoud@gmail.com",
     description = (
