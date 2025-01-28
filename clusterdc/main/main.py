@@ -127,6 +127,71 @@ def create_contours(xx, yy, f, levels):
     # Return the informations about the contour polygons
     return polygon, density_values, density_contours
 
+# def make_node_dic(polygon, density_values, density_contours):
+#     """
+#     This function creates a dictionary of nodes, representing the contours, with each node containing information about its level, density, children, parent, and token.
+#     Parameters:
+#         polygon (list): A list of polygons representing the contours. Each polygon is a list of x and y coordinates of the contour.
+#         density_values (list): A list of density values for each contour.
+#         density_contours (list): A list of contour indices for each polygon.
+#     Returns:
+#         dic_node (dict): A dictionary of nodes, each representing a contour.
+#     """
+#     # Create dictionary of nodes with level, density, children, parent, and token information
+#     dic_node = {ind: {'level': density_contours[ind], 'density': density_values[ind], 'childrens': [], 'parent': [], 'token': []} for ind in range(len(polygon))}
+#     for ind in range(len(polygon)):
+#         if polygon[ind][0][0] == polygon[ind][0][-1] and polygon[ind][1][0] == polygon[ind][1][-1]:
+#             for ind_sub in range(len(polygon)):
+#                 if polygon[ind_sub][0][0] == polygon[ind_sub][0][-1] and polygon[ind_sub][1][0] == polygon[ind_sub][1][-1]:
+#                     # Check if the subpolygon is one level higher than polygon and has higher density
+#                     if dic_node[ind_sub]['level'] == dic_node[ind]['level'] + 1 and dic_node[ind_sub]['density'] > dic_node[ind]['density']:
+#                         # Check if polygon contains subpolygon
+#                         poly = Polygon([(polygon[ind][0][index], polygon[ind][1][index]) for index in range(len(polygon[ind][0]))])
+#                         poly_sub = Polygon([(polygon[ind_sub][0][index], polygon[ind_sub][1][index]) for index in range(len(polygon[ind_sub][0]))])
+#                         if poly.contains(poly_sub):
+#                             # Add subpolygon to the children list of the polygon
+#                             dic_node[ind]['childrens'].append(ind_sub)
+#                             # Add polygon to the parent list of the subpolygon
+#                             dic_node[ind_sub]['parent'].append(ind)  
+#                 else:
+#                     if ind_sub in dic_node.keys():
+#                         del dic_node[ind_sub]
+#         else:
+#             if ind in dic_node.keys():
+#                 del dic_node[ind]
+#     # Find the maximum level in the dictionary
+#     max_level = -1
+#     for node in dic_node.keys():
+#         if dic_node[node]['level'] > max_level:
+#             max_level = dic_node[node]['level']
+#     # Loop through levels from max level to 1
+#     for level in range(max_level, 0, -1):
+#         list_node_level = []
+#         # Find all nodes of the current level
+#         for node in dic_node.keys():
+#             if dic_node[node]['level'] == level:
+#                 list_node_level.append(node)
+#         # Loop through nodes of the current level
+#         for ind_node in list_node_level:    
+#             for ind_node_sub in list_node_level:
+#                 poly = Polygon([(polygon[ind_node][0][index], polygon[ind_node][1][index]) for index in range(len(polygon[ind_node][0]))])
+#                 poly_sub = Polygon([(polygon[ind_node_sub][0][index], polygon[ind_node_sub][1][index]) for index in range(len(polygon[ind_node_sub][0]))])
+#                 # Check if polygon contains subpolygon
+#                 if poly.contains(poly_sub) and ind_node != ind_node_sub:
+#                     # Delete subpolygon node
+#                     if ind_node_sub in dic_node.keys():
+#                         del dic_node[ind_node_sub]
+#     # Find all children of the root node
+#     children = []
+#     for ind in dic_node.keys():
+#         if dic_node[ind]['level'] == 1:
+#             dic_node[ind]['parent'] = '*'
+#             children.append(ind)
+#     # Create root node with all children
+#     dic_node['*'] = {'level': 0, 'density': 0, 'childrens': children, 'parent': ['**'], 'token': []}      
+#     # Return the built dictionary.
+#     return dic_node
+
 def make_node_dic(polygon, density_values, density_contours):
     """
     This function creates a dictionary of nodes, representing the contours, with each node containing information about its level, density, children, parent, and token.
@@ -139,31 +204,39 @@ def make_node_dic(polygon, density_values, density_contours):
     """
     # Create dictionary of nodes with level, density, children, parent, and token information
     dic_node = {ind: {'level': density_contours[ind], 'density': density_values[ind], 'childrens': [], 'parent': [], 'token': []} for ind in range(len(polygon))}
+    
     for ind in range(len(polygon)):
-        if polygon[ind][0][0] == polygon[ind][0][-1] and polygon[ind][1][0] == polygon[ind][1][-1]:
-            for ind_sub in range(len(polygon)):
-                if polygon[ind_sub][0][0] == polygon[ind_sub][0][-1] and polygon[ind_sub][1][0] == polygon[ind_sub][1][-1]:
-                    # Check if the subpolygon is one level higher than polygon and has higher density
-                    if dic_node[ind_sub]['level'] == dic_node[ind]['level'] + 1 and dic_node[ind_sub]['density'] > dic_node[ind]['density']:
-                        # Check if polygon contains subpolygon
-                        poly = Polygon([(polygon[ind][0][index], polygon[ind][1][index]) for index in range(len(polygon[ind][0]))])
-                        poly_sub = Polygon([(polygon[ind_sub][0][index], polygon[ind_sub][1][index]) for index in range(len(polygon[ind_sub][0]))])
-                        if poly.contains(poly_sub):
-                            # Add subpolygon to the children list of the polygon
-                            dic_node[ind]['childrens'].append(ind_sub)
-                            # Add polygon to the parent list of the subpolygon
-                            dic_node[ind_sub]['parent'].append(ind)  
-                else:
-                    if ind_sub in dic_node.keys():
-                        del dic_node[ind_sub]
+        if len(polygon[ind][0]) > 0 and len(polygon[ind][1]) > 0:
+            if polygon[ind][0][0] == polygon[ind][0][-1] and polygon[ind][1][0] == polygon[ind][1][-1]:
+                for ind_sub in range(len(polygon)):
+                    if len(polygon[ind_sub][0]) > 0 and len(polygon[ind_sub][1]) > 0:
+                        if polygon[ind_sub][0][0] == polygon[ind_sub][0][-1] and polygon[ind_sub][1][0] == polygon[ind_sub][1][-1]:
+                            # Check if the subpolygon is one level higher than polygon and has higher density
+                            if dic_node[ind_sub]['level'] == dic_node[ind]['level'] + 1 and dic_node[ind_sub]['density'] > dic_node[ind]['density']:
+                                # Check if polygon contains subpolygon
+                                poly = Polygon([(polygon[ind][0][index], polygon[ind][1][index]) for index in range(len(polygon[ind][0]))])
+                                poly_sub = Polygon([(polygon[ind_sub][0][index], polygon[ind_sub][1][index]) for index in range(len(polygon[ind_sub][0]))])
+                                if poly.contains(poly_sub):
+                                    # Add subpolygon to the children list of the polygon
+                                    dic_node[ind]['childrens'].append(ind_sub)
+                                    # Add polygon to the parent list of the subpolygon
+                                    dic_node[ind_sub]['parent'].append(ind)
+                        else:
+                            if ind_sub in dic_node.keys():
+                                del dic_node[ind_sub]
+            else:
+                if ind in dic_node.keys():
+                    del dic_node[ind]
         else:
             if ind in dic_node.keys():
                 del dic_node[ind]
+
     # Find the maximum level in the dictionary
     max_level = -1
     for node in dic_node.keys():
         if dic_node[node]['level'] > max_level:
             max_level = dic_node[node]['level']
+    
     # Loop through levels from max level to 1
     for level in range(max_level, 0, -1):
         list_node_level = []
@@ -172,7 +245,7 @@ def make_node_dic(polygon, density_values, density_contours):
             if dic_node[node]['level'] == level:
                 list_node_level.append(node)
         # Loop through nodes of the current level
-        for ind_node in list_node_level:    
+        for ind_node in list_node_level:
             for ind_node_sub in list_node_level:
                 poly = Polygon([(polygon[ind_node][0][index], polygon[ind_node][1][index]) for index in range(len(polygon[ind_node][0]))])
                 poly_sub = Polygon([(polygon[ind_node_sub][0][index], polygon[ind_node_sub][1][index]) for index in range(len(polygon[ind_node_sub][0]))])
@@ -181,17 +254,20 @@ def make_node_dic(polygon, density_values, density_contours):
                     # Delete subpolygon node
                     if ind_node_sub in dic_node.keys():
                         del dic_node[ind_node_sub]
+
     # Find all children of the root node
     children = []
     for ind in dic_node.keys():
         if dic_node[ind]['level'] == 1:
             dic_node[ind]['parent'] = '*'
             children.append(ind)
+    
     # Create root node with all children
-    dic_node['*'] = {'level': 0, 'density': 0, 'childrens': children, 'parent': ['**'], 'token': []}      
+    dic_node['*'] = {'level': 0, 'density': 0, 'childrens': children, 'parent': ['**'], 'token': []}
+    
     # Return the built dictionary.
     return dic_node
-
+    
 def find_leaves(dic_node):
     """
     This function finds all leaf nodes in the dictionary of nodes.
