@@ -254,16 +254,13 @@ loaded_model = ClusterDC.load_clustering('my_clustering_model.cdc')
 
 ## Example Notebook
 
-To see detailed examples of how to use the library, please refer to the provided Jupyter Notebook file in the examples directory. The notebook demonstrate the usage of the functions with sample data and provide visualizations of the analysis and clustering results.
+To see detailed examples of how to use the library, please refer to the provided Jupyter Notebook files in the [examples directory](https://github.com/samerhmoud/clusterdc/tree/main/clusterdc/examples). These notebooks demonstrate the usage of the functions with sample data and provide visualizations of the analysis and clustering results. They serve as practical guides to help you get started with ClusterDC and understand its various capabilities.
 
 ## Upcoming Improvements
 
 We're actively working on enhancing ClusterDC with:
 
-- Integration with more dimension reduction techniques
-- Improved performance for very large datasets
 - More advanced visualization capabilities
-- GPU acceleration for compute-intensive operations
 - Extended documentation and tutorials
 
 ## Contact
