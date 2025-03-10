@@ -10,7 +10,10 @@ networkx>=2.5
 tqdm>=4.50.0
 joblib>=1.0.0
 pillow>=7.1.0
-
+requests>=2.24.0
+pathlib>=1.0.1
+typing-extensions>=3.7.4.3
+urllib3>=1.25.8
 # Note for Conda users:
 # If installing in a conda environment, you may want to use:
 # conda install -y numpy=1.24.3 matplotlib=3.7.1

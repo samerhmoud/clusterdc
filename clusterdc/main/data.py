@@ -3,9 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from typing import Optional, Union, List, Dict, Tuple
 from pathlib import Path
+import urllib.parse
+import requests
+from io import StringIO, BytesIO
+import os
 from .kde import KDE
 from sklearn.neighbors import KDTree
-
 
 
 class Data:
@@ -29,21 +32,166 @@ class Data:
         np.random.seed(42)
         self.random_state = 42
         
+        # Built-in dataset URLs
+        self.datasets = {
+            "training_data": "https://github.com/samerhmoud/clusterdc/blob/main/clusterdc/datasets/training_data.csv",
+            "spiral_data": "https://github.com/samerhmoud/clusterdc/blob/main/clusterdc/datasets/spiral_data.csv"
+        }
+        
+    def list_available_datasets(self) -> List[str]:
+        """
+        Returns a list of all available built-in datasets.
+        
+        Returns:
+            List[str]: Names of available datasets
+        """
+        return list(self.datasets.keys())
+        
     def read_file(self, 
                   file_path: str, 
                   sheet_name: Optional[str] = None,
                   **kwargs) -> pd.DataFrame:
         """
-        Reads data from CSV or Excel files into a pandas DataFrame.
+        Reads data from local files, URLs, or built-in datasets into a pandas DataFrame.
 
         Parameters:
-            file_path (str): Path to the file to be read
+            file_path (str): Path to the file, URL, or name of built-in dataset to be read
             sheet_name (Optional[str]): Name of the sheet for Excel files
             **kwargs: Additional parameters to pass to pandas read functions
 
         Returns:
             pd.DataFrame: The loaded DataFrame
 
+        Raises:
+            ValueError: If file format is not supported or dataset name not found
+            Exception: If there are errors during file reading
+        """
+        # Check if the file_path is a built-in dataset name
+        if file_path in self.datasets:
+            print(f"Loading built-in dataset: {file_path}")
+            return self._read_from_url(self.datasets[file_path], sheet_name, **kwargs)
+        
+        # Check if the file_path is a URL
+        is_url = self._is_url(file_path)
+        
+        if is_url:
+            # Handle URL
+            return self._read_from_url(file_path, sheet_name, **kwargs)
+        else:
+            # Handle local file
+            return self._read_from_local(file_path, sheet_name, **kwargs)
+    
+    def _is_url(self, path: str) -> bool:
+        """
+        Determines if a path is a URL.
+        
+        Parameters:
+            path (str): The path to check
+            
+        Returns:
+            bool: True if the path is a URL, False otherwise
+        """
+        try:
+            result = urllib.parse.urlparse(path)
+            return all([result.scheme, result.netloc])
+        except ValueError:
+            return False
+    
+    def _read_from_url(self, 
+                      url: str, 
+                      sheet_name: Optional[str] = None,
+                      **kwargs) -> pd.DataFrame:
+        """
+        Reads data from a URL into a pandas DataFrame.
+        
+        Parameters:
+            url (str): URL of the file to be read
+            sheet_name (Optional[str]): Name of the sheet for Excel files
+            **kwargs: Additional parameters to pass to pandas read functions
+            
+        Returns:
+            pd.DataFrame: The loaded DataFrame
+            
+        Raises:
+            ValueError: If file format is not supported
+            Exception: If there are errors during file reading
+        """
+        # Store original URL
+        original_url = url
+        
+        # Handle GitHub URLs - convert to raw content URL
+        if 'github.com' in url and '/blob/' in url:
+            # Convert GitHub URL to raw content URL
+            url = url.replace('github.com', 'raw.githubusercontent.com')
+            url = url.replace('/blob/', '/')
+            print(f"GitHub URL detected. Using raw content URL: {url}")
+        
+        self.file_path = url
+        
+        # Determine file type from URL
+        parsed_url = urllib.parse.urlparse(url)
+        path = parsed_url.path
+        self.file_type = os.path.splitext(path)[1].lower()
+        
+        try:
+            # Download the file content
+            response = requests.get(url)
+            response.raise_for_status()  # Raise exception for HTTP errors
+            
+            if self.file_type == '.csv':
+                # Use StringIO for CSV content
+                content = StringIO(response.text)
+                self.data = pd.read_csv(content, **kwargs)
+            elif self.file_type in ['.xlsx', '.xls']:
+                # Use BytesIO for binary content (Excel)
+                content = BytesIO(response.content)
+                self.data = pd.read_excel(content, sheet_name=sheet_name, **kwargs)
+            elif self.file_type == '.json':
+                # Handle JSON data
+                self.data = pd.read_json(StringIO(response.text), **kwargs)
+            elif self.file_type == '.html' or self.file_type == '.htm':
+                # Handle HTML tables
+                self.data = pd.read_html(url, **kwargs)[0]  # Get first table by default
+            else:
+                raise ValueError(f"Unsupported file format: {self.file_type}")
+            
+            print(f"Successfully loaded data from URL: {original_url}")
+            print(f"Shape: {self.data.shape}")
+            return self.data
+            
+        except Exception as e:
+            print(f"Error reading file from URL: {str(e)}")
+            
+            # If GitHub URL failed, try to read tables directly from the HTML
+            if 'github.com' in original_url and '/blob/' in original_url and '.csv' in original_url:
+                try:
+                    print("Attempting to read CSV data directly from GitHub HTML page...")
+                    tables = pd.read_html(original_url)
+                    if tables:
+                        self.data = tables[0]  # Usually the first table contains the CSV data
+                        print(f"Successfully extracted table from GitHub HTML page")
+                        print(f"Shape: {self.data.shape}")
+                        return self.data
+                except Exception as table_error:
+                    print(f"Failed to extract table from GitHub page: {str(table_error)}")
+            
+            raise e
+    
+    def _read_from_local(self, 
+                       file_path: str, 
+                       sheet_name: Optional[str] = None,
+                       **kwargs) -> pd.DataFrame:
+        """
+        Reads data from a local file into a pandas DataFrame.
+        
+        Parameters:
+            file_path (str): Path to the local file to be read
+            sheet_name (Optional[str]): Name of the sheet for Excel files
+            **kwargs: Additional parameters to pass to pandas read functions
+            
+        Returns:
+            pd.DataFrame: The loaded DataFrame
+            
         Raises:
             ValueError: If file format is not supported
             Exception: If there are errors during file reading
@@ -56,6 +204,10 @@ class Data:
                 self.data = pd.read_csv(file_path, **kwargs)
             elif self.file_type in ['.xlsx', '.xls']:
                 self.data = pd.read_excel(file_path, sheet_name=sheet_name, **kwargs)
+            elif self.file_type == '.json':
+                self.data = pd.read_json(file_path, **kwargs)
+            elif self.file_type == '.html' or self.file_type == '.htm':
+                self.data = pd.read_html(file_path, **kwargs)[0]  # Get first table by default
             else:
                 raise ValueError(f"Unsupported file format: {self.file_type}")
                 
@@ -64,9 +216,11 @@ class Data:
             return self.data
             
         except Exception as e:
-            print(f"Error reading file: {str(e)}")
+            print(f"Error reading local file: {str(e)}")
             raise
-    
+
+    # The rest of the class methods remain the same...
+
     def get_summary(self) -> pd.DataFrame:
         """
         Generates a comprehensive summary of the loaded data.

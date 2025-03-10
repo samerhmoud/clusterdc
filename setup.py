@@ -80,18 +80,22 @@ setup(
     ],
     python_requires=">=3.6",  # Minimum Python version
     install_requires=[
-        # Core dependencies with more flexible version ranges
-        "numpy>=1.19.0,<2.0.0",  # Stay with 1.x for maximum compatibility
-        "pandas>=1.1.0",
-        "matplotlib>=3.3.0,<3.8.0",  # Added upper bound for compatibility  
-        "scipy>=1.5.0",  # No upper bound to avoid conflicts with gensim
-        "scikit-learn>=1.0.0",
-        "scikit-optimize>=0.8.0", 
-        "shapely>=1.7.0",
-        "networkx>=2.5",
-        "tqdm>=4.50.0",
-        "joblib>=1.0.0",
-        "pillow>=7.1.0",  # Lower minimum to be compatible with streamlit
+    # Core dependencies with more flexible version ranges
+    "numpy>=1.19.0,<2.0.0",  # Stay with 1.x for maximum compatibility
+    "pandas>=1.1.0",
+    "matplotlib>=3.3.0,<3.8.0",  # Added upper bound for compatibility  
+    "scipy>=1.5.0",  # No upper bound to avoid conflicts with gensim
+    "scikit-learn>=1.0.0",
+    "scikit-optimize>=0.8.0", 
+    "shapely>=1.7.0",
+    "networkx>=2.5",
+    "tqdm>=4.50.0",
+    "joblib>=1.0.0",
+    "pillow>=7.1.0",  # Lower minimum to be compatible with streamlit
+    "requests>=2.24.0",
+    "pathlib>=1.0.1",  # For Python 3.6 compatibility
+    "typing-extensions>=3.7.4.3",  # For Python 3.6 compatibility
+    "urllib3>=1.25.8",
     ],
     keywords="clustering, density, contour, machine learning, data science, geochemistry, analysis",
     project_urls={
