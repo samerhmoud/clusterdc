@@ -162,7 +162,7 @@ results, model, predictions = KDE.benchmark_and_predict(
 The `KDE` class offers also localized and globally optimized bandwidths using Bayesian Optimization:
 
 ```python
-from clusterdc import Data, KDE
+from clusterdc import KDE
 
 # Initialize KDE with options
 kde = KDE(
@@ -192,8 +192,7 @@ kde.print_optimization_report()
 Aftet estimating data density using `KDE`, `ClusterDC` will identify clusters in data based on `KDE`.
 
 ```python
-from clusterdc import Data, KDE, ClusterDC
-import matplotlib.pyplot as plt
+from clusterdc import ClusterDC
 
 # Create ClusterDC object with 2D data
 cluster_dc = ClusterDC(
@@ -281,18 +280,20 @@ If you use ClusterDC in your work, please include the following attribution:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/samerhmoud/clusterdc/blob/main/LICENSE.txt) file for details.
 
 ## Acknowledgements
 
 We would like to acknowledge:
 
-- The PaCMAP team for providing the PaCMAP dimension reduction algorithm, which is useful for reducing the dimensionality of the data before applying ClusterDC. For more information, refer to the [PaCMAP GitHub repository](https://github.com/YingfanWang/PaCMAP).
+- The PaCMAP team for providing the PaCMAP dimension reduction algorithm, which is useful for reducing the dimensionality of the data before applying ClusterDC. For more information, refer to the [PaCMAP & LocalMAP GitHub repository](https://github.com/YingfanWang/PaCMAP).
 
 - The ClusterDV team for the development of the ClusterDV MATLAB code and the synthetic datasets provided with it. ClusterDC was developed as an extension of ClusterDV to overcome its limitations in processing large datasets. For more details on ClusterDV, see the [ClusterDV GitHub repository](https://github.com/jcbmarques/clusterdv).
 
 Please refer to the following references for more information:
 
 - [Wang, Y., Huang, H., Rudin, C., & Shaposhnik, Y. (2021). Understanding How Dimension Reduction Tools Work: An Empirical Approach to Deciphering t-SNE, UMAP, TriMap, and PaCMAP for Data Visualization. Journal of Machine Learning Research, 22(201), 1-73.](http://jmlr.org/papers/v22/20-1061.html)
+
+- [Wang, Y., Sun, Y., Huang, H., & Rudin, C. (2024). Dimension Reduction with Locally Adjusted Graphs. arXiv preprint arXiv:2412.15426.](https://arxiv.org/pdf/2412.15426)
 
 - [Marques, J. C., & Orger, M. B. (2019). Clusterdv: a simple density-based clustering method that is robust, general and automatic. Bioinformatics, 35(12), 2125-2132.](https://doi.org/10.1093/bioinformatics/bty907)
