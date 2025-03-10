@@ -59,7 +59,7 @@ except FileNotFoundError:
 
 setup(
     name="clusterdc",  # Unique name for your package
-    version="0.0.0.2",  # Version of your package
+    version="0.0.7",  # Version of your package
     author="Samer Hmoud & Maximilien Meyrieux",
     author_email="geo.samer.hmoud@gmail.com",
     description=(
