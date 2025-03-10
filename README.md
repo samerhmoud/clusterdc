@@ -218,7 +218,7 @@ cluster_df = cluster_dc.get_cluster_assignments()
 
 ### Advanced Clustering
 
-The `ClusterDC` class provides sophisticated clustering capabilities:
+The `ClusterDC` class provides advanced clustering capabilities:
 
 ```python
 from clusterdc import ClusterDC
